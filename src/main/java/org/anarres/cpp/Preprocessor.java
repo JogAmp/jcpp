@@ -522,7 +522,7 @@ public class Preprocessor implements Closeable {
      * @see #pop_source()
      */
     // @CheckForNull
-    protected Source getSource() {
+    public Source getSource() {
         return source;
     }
 
@@ -567,8 +567,11 @@ public class Preprocessor implements Closeable {
                 && t != null) {
             /* We actually want 'did the nested source
              * contain a newline token', which isNumbered()
-             * approximates. This is not perfect, but works. */
-            return line_token(t.getLine() + 1, t.getName(), " 2");
+             * approximates. This is not perfect, but works.
+             * FIXME: Removed the '+ 1', since all lines were off by one.
+             * This solves this case, but I don't know _why_ this was here in the first place.
+             */
+            return line_token(t.getLine() /* SEE ABOVE: + 1 */, t.getName(), " 2");
         }
 
         return null;

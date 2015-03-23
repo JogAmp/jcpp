@@ -104,7 +104,7 @@ public abstract class Source implements Iterable<Token>, Closeable {
      *
      * Sources form a singly linked list.
      */
-    /* pp */ final Source getParent() {
+    public final Source getParent() {
         return parent;
     }
 
