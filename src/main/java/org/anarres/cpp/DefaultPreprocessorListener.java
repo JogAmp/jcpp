@@ -55,7 +55,7 @@ public class DefaultPreprocessorListener implements PreprocessorListener {
         return warnings;
     }
 
-    protected void print(@Nonnull String msg) {
+    protected void print(@Nonnull final String msg) {
         LOG.info(msg);
     }
 
@@ -67,8 +67,8 @@ public class DefaultPreprocessorListener implements PreprocessorListener {
      * it may throw an exception.
      */
     @Override
-    public void handleWarning(Source source, int line, int column,
-            String msg)
+    public void handleWarning(final Source source, final int line, final int column,
+            final String msg)
             throws LexerException {
         warnings++;
         print(source.getName() + ":" + line + ":" + column
@@ -83,8 +83,8 @@ public class DefaultPreprocessorListener implements PreprocessorListener {
      * it may throw an exception.
      */
     @Override
-    public void handleError(Source source, int line, int column,
-            String msg)
+    public void handleError(final Source source, final int line, final int column,
+            final String msg)
             throws LexerException {
         errors++;
         print(source.getName() + ":" + line + ":" + column
@@ -92,7 +92,7 @@ public class DefaultPreprocessorListener implements PreprocessorListener {
     }
 
     @Override
-    public void handleSourceChange(Source source, SourceChangeEvent event) {
+    public void handleSourceChange(final Source source, final SourceChangeEvent event) {
     }
 
 }

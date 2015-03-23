@@ -30,7 +30,7 @@ import java.util.List;
 public class Macro {
 
     private Source source;
-    private String name;
+    private final String name;
     /* It's an explicit decision to keep these around here. We don't
      * need to; the argument token type is M_ARG and the value
      * is the index. The strings themselves are only used in
@@ -39,7 +39,7 @@ public class Macro {
     private boolean variadic;
     private List<Token> tokens;
 
-    public Macro(Source source, String name) {
+    public Macro(final Source source, final String name) {
         this.source = source;
         this.name = name;
         this.args = null;
@@ -47,14 +47,14 @@ public class Macro {
         this.tokens = new ArrayList<Token>();
     }
 
-    public Macro(String name) {
+    public Macro(final String name) {
         this(null, name);
     }
 
     /**
      * Sets the Source from which this macro was parsed.
      */
-    public void setSource(Source s) {
+    public void setSource(final Source s) {
         this.source = s;
     }
 
@@ -78,7 +78,7 @@ public class Macro {
     /**
      * Sets the arguments to this macro.
      */
-    public void setArgs(List<String> args) {
+    public void setArgs(final List<String> args) {
         this.args = args;
     }
 
@@ -99,7 +99,7 @@ public class Macro {
     /**
      * Sets the variadic flag on this Macro.
      */
-    public void setVariadic(boolean b) {
+    public void setVariadic(final boolean b) {
         this.variadic = b;
     }
 
@@ -113,7 +113,7 @@ public class Macro {
     /**
      * Adds a token to the expansion of this macro.
      */
-    public void addToken(Token tok) {
+    public void addToken(final Token tok) {
         this.tokens.add(tok);
     }
 
@@ -124,7 +124,7 @@ public class Macro {
      * to the previous token when the macro is expanded.
      * It is an error for a macro to end with a paste token.
      */
-    public void addPaste(Token tok) {
+    public void addPaste(final Token tok) {
         /*
          * Given: tok0 ## tok1
          * We generate: M_PASTE, tok0, tok1
@@ -144,9 +144,9 @@ public class Macro {
      * swaps them around again. We know that there will never be two
      * sequential paste tokens, so a boolean is sufficient. */
     public String getText() {
-        StringBuilder buf = new StringBuilder();
+        final StringBuilder buf = new StringBuilder();
         boolean paste = false;
-        for (Token tok : tokens) {
+        for (final Token tok : tokens) {
             if (tok.getType() == Token.M_PASTE) {
                 assert paste == false : "Two sequential pastes.";
                 paste = true;
@@ -165,10 +165,10 @@ public class Macro {
 
     @Override
     public String toString() {
-        StringBuilder buf = new StringBuilder(name);
+        final StringBuilder buf = new StringBuilder(name);
         if (args != null) {
             buf.append('(');
-            Iterator<String> it = args.iterator();
+            final Iterator<String> it = args.iterator();
             while (it.hasNext()) {
                 buf.append(it.next());
                 if (it.hasNext())

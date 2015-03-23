@@ -94,7 +94,7 @@ public abstract class Source implements Iterable<Token>, Closeable {
      *
      * Sources form a singly linked list.
      */
-    /* pp */ void setParent(Source parent, boolean autopop) {
+    /* pp */ void setParent(final Source parent, final boolean autopop) {
         this.parent = parent;
         this.autopop = autopop;
     }
@@ -110,7 +110,7 @@ public abstract class Source implements Iterable<Token>, Closeable {
 
 
     // @OverrideMustInvoke
-	/* pp */ void init(Preprocessor pp) {
+	/* pp */ void init(final Preprocessor pp) {
         setListener(pp.getListener());
         this.werror = pp.getWarnings().contains(Warning.ERROR);
     }
@@ -122,7 +122,7 @@ public abstract class Source implements Iterable<Token>, Closeable {
      * used, but if you are using a Source as a standalone object,
      * you may wish to call this.
      */
-    public void setListener(PreprocessorListener pl) {
+    public void setListener(final PreprocessorListener pl) {
         this.listener = pl;
     }
 
@@ -135,7 +135,7 @@ public abstract class Source implements Iterable<Token>, Closeable {
      */
     @CheckForNull
     public String getPath() {
-        Source parent = getParent();
+        final Source parent = getParent();
         if (parent != null)
             return parent.getPath();
         return null;
@@ -146,7 +146,7 @@ public abstract class Source implements Iterable<Token>, Closeable {
      */
     @CheckForNull
     public String getName() {
-        Source parent = getParent();
+        final Source parent = getParent();
         if (parent != null)
             return parent.getName();
         return null;
@@ -157,7 +157,7 @@ public abstract class Source implements Iterable<Token>, Closeable {
      */
     @Nonnegative
     public int getLine() {
-        Source parent = getParent();
+        final Source parent = getParent();
         if (parent == null)
             return 0;
         return parent.getLine();
@@ -167,7 +167,7 @@ public abstract class Source implements Iterable<Token>, Closeable {
      * Returns the current column number within this Source.
      */
     public int getColumn() {
-        Source parent = getParent();
+        final Source parent = getParent();
         if (parent == null)
             return 0;
         return parent.getColumn();
@@ -178,8 +178,8 @@ public abstract class Source implements Iterable<Token>, Closeable {
      *
      * This is used to prevent macro recursion.
      */
-    /* pp */ boolean isExpanding(@Nonnull Macro m) {
-        Source parent = getParent();
+    /* pp */ boolean isExpanding(@Nonnull final Macro m) {
+        final Source parent = getParent();
         if (parent != null)
             return parent.isExpanding(m);
         return false;
@@ -204,7 +204,7 @@ public abstract class Source implements Iterable<Token>, Closeable {
 
     /* This is an incredibly lazy way of disabling warnings when
      * the source is not active. */
-    /* pp */ void setActive(boolean b) {
+    /* pp */ void setActive(final boolean b) {
         this.active = b;
     }
 
@@ -238,11 +238,11 @@ public abstract class Source implements Iterable<Token>, Closeable {
      * @return the NL token.
      */
     @Nonnull
-    public Token skipline(boolean white)
+    public Token skipline(final boolean white)
             throws IOException,
             LexerException {
         for (;;) {
-            Token tok = token();
+            final Token tok = token();
             switch (tok.getType()) {
                 case EOF:
                     /* There ought to be a newline before EOF.
@@ -271,7 +271,7 @@ public abstract class Source implements Iterable<Token>, Closeable {
         }
     }
 
-    protected void error(int line, int column, String msg)
+    protected void error(final int line, final int column, final String msg)
             throws LexerException {
         if (listener != null)
             listener.handleError(this, line, column, msg);
@@ -279,7 +279,7 @@ public abstract class Source implements Iterable<Token>, Closeable {
             throw new LexerException("Error at " + line + ":" + column + ": " + msg);
     }
 
-    protected void warning(int line, int column, String msg)
+    protected void warning(final int line, final int column, final String msg)
             throws LexerException {
         if (werror)
             error(line, column, msg);
