@@ -31,12 +31,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
+
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import static org.anarres.cpp.PreprocessorCommand.*;
+
 import org.anarres.cpp.PreprocessorListener.SourceChangeEvent;
+
+import com.jogamp.gluegen.Logging;
+import com.jogamp.gluegen.Logging.LoggerIf;
+
 import static org.anarres.cpp.Token.*;
 
 /**
@@ -76,7 +81,7 @@ import static org.anarres.cpp.Token.*;
  */
 public class Preprocessor implements Closeable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Preprocessor.class);
+    private static final LoggerIf LOG = Logging.getLogger(Preprocessor.class);
 
     private static final Source INTERNAL = new Source() {
         @Override

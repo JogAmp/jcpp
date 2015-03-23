@@ -18,8 +18,9 @@ package org.anarres.cpp;
  */
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.jogamp.gluegen.Logging;
+import com.jogamp.gluegen.Logging.LoggerIf;
 
 /**
  * A handler for preprocessor events, primarily errors and warnings.
@@ -30,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultPreprocessorListener implements PreprocessorListener {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultPreprocessorListener.class);
+    private static final LoggerIf LOG = Logging.getLogger(DefaultPreprocessorListener.class);
 
     private int errors;
     private int warnings;
