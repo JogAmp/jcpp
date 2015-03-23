@@ -364,6 +364,10 @@ public class Preprocessor implements Closeable {
         /* Already handled as a source error in macro(). */
         if ("defined".equals(name))
             throw new LexerException("Cannot redefine name 'defined'");
+
+        if ( isActive() && null != source && !source.isExpanding(m) ) {
+            m.setTokens( expand( m.getTokens() ) );
+        }
         macros.put(m.getName(), m);
     }
 

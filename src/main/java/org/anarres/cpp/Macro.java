@@ -138,6 +138,9 @@ public class Macro {
     /* pp */ List<Token> getTokens() {
         return tokens;
     }
+    /* pp */ void setTokens(final List<Token> tokens) {
+        this.tokens = tokens;
+    }
 
     /* Paste tokens are inserted before the first of the two pasted
      * tokens, so it's a kind of bytecode notation. This method
