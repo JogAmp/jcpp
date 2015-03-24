@@ -1,25 +1,17 @@
 /**
  * Copyright 2015 JogAmp Community. All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied.  See the License for the specific language governing
+ * permissions and limitations under the License.
  *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
@@ -28,6 +20,7 @@
 package com.jogamp.gluegen.jcpp;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -96,11 +89,17 @@ public class JCPP implements GenericCPP {
     }
 
     @Override
-    public List<ConstantDefinition> getConstantDefinitions() {
+    public List<ConstantDefinition> getConstantDefinitions() throws GlueGenException {
         final List<ConstantDefinition> constants = new ArrayList<ConstantDefinition>();
-        final Map<String, Macro> macroMap = cpp.getMacros();
-        final Collection<Macro> macros = macroMap.values();
-        for(final Macro macro : macros) {
+        final List<Macro> macros;
+        try {
+            macros = cpp.getMacros(true);
+        } catch (final Throwable t) {
+            throw new GlueGenException(t);
+        }
+        final int count = macros.size();
+        for(int i=0; i<count; i++) {
+            final Macro macro = macros.get(i);
             final String name = macro.getName();
             if( !GlueGen.__GLUEGEN__.equals(name) ) {
                 if( !macro.isFunctionLike() ) {

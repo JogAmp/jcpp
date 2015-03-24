@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class Macro {
 
-    private Source source;
+    private final Source source;
     private final String name;
     /* It's an explicit decision to keep these around here. We don't
      * need to; the argument token type is M_ARG and the value
@@ -37,6 +37,7 @@ public class Macro {
      * stringification of the macro, for debugging. */
     private List<String> args;
     private boolean variadic;
+    private boolean hasPaste;
     private List<Token> tokens;
 
     public Macro(final Source source, final String name) {
@@ -44,18 +45,34 @@ public class Macro {
         this.name = name;
         this.args = null;
         this.variadic = false;
+        this.hasPaste = false;
         this.tokens = new ArrayList<Token>();
+    }
+    public Macro(final Macro o) {
+        this(o, o.tokens, true);
+    }
+    public Macro(final Macro o, final List<Token> tokens) {
+        this(o, tokens, false);
+    }
+    private Macro(final Macro o, final List<Token> tokens, final boolean copyTokens) {
+        this.source = o.source;
+        this.name = o.name;
+        if(null != o.args) {
+            this.args = new ArrayList<String>(o.args);
+        } else {
+            this.args = null;
+        }
+        this.variadic = o.variadic;
+        this.hasPaste = o.hasPaste;
+        if(null != tokens) {
+            this.tokens = copyTokens ? new ArrayList<Token>(tokens) : tokens;
+        } else {
+            this.tokens = new ArrayList<Token>();
+        }
     }
 
     public Macro(final String name) {
         this(null, name);
-    }
-
-    /**
-     * Sets the Source from which this macro was parsed.
-     */
-    public void setSource(final Source s) {
-        this.source = s;
     }
 
     /**
@@ -78,7 +95,7 @@ public class Macro {
     /**
      * Sets the arguments to this macro.
      */
-    public void setArgs(final List<String> args) {
+    /* pp */ void setArgs(final List<String> args) {
         this.args = args;
     }
 
@@ -111,6 +128,13 @@ public class Macro {
     }
 
     /**
+     * Returns true if this macro contains a "paste" operator.
+     */
+    public boolean hasPaste() {
+        return hasPaste;
+    }
+
+    /**
      * Adds a token to the expansion of this macro.
      */
     public void addToken(final Token tok) {
@@ -133,13 +157,11 @@ public class Macro {
          *   M_PASTE, tok0, M_PASTE, tok1, tok2
          */
         this.tokens.add(tokens.size() - 1, tok);
+        this.hasPaste = true;
     }
 
     /* pp */ List<Token> getTokens() {
         return tokens;
-    }
-    /* pp */ void setTokens(final List<Token> tokens) {
-        this.tokens = tokens;
     }
 
     /* Paste tokens are inserted before the first of the two pasted

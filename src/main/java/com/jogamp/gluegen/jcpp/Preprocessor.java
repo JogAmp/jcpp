@@ -360,11 +360,8 @@ public class Preprocessor implements Closeable {
         // System.out.println("Macro " + m);
         final String name = m.getName();
         /* Already handled as a source error in macro(). */
-        if ("defined".equals(name))
+        if ("defined".equals(name)) {
             throw new LexerException("Cannot redefine name 'defined'");
-
-        if ( isActive() && null != source && !source.isExpanding(m) ) {
-            m.setTokens( expand( m.getTokens() ) );
         }
         macros.put(m.getName(), m);
     }
@@ -380,11 +377,15 @@ public class Preprocessor implements Closeable {
         try {
             final Macro m = new Macro(name);
             final StringLexerSource s = new StringLexerSource(value);
-            for (;;) {
-                final Token tok = s.token();
-                if (tok.getType() == EOF)
-                    break;
-                m.addToken(tok);
+            try {
+                for (;;) {
+                    final Token tok = s.token();
+                    if (tok.getType() == EOF)
+                        break;
+                    m.addToken(tok);
+                }
+            } finally {
+                s.close();
             }
             addMacro(m);
         } catch (final IOException e) {
@@ -465,6 +466,29 @@ public class Preprocessor implements Closeable {
     @Nonnull
     public Map<String, Macro> getMacros() {
         return macros;
+    }
+
+    /**
+     * Returns a list of {@link Macro}s.
+     * <p>
+     * Implementation returns a new list of copy-ctor {@link Macro}s.
+     * </p>
+     * @param expand if {@code true} and if macro is not {@link Macro#isFunctionLike() function-like},
+     *               i.e. a constant, the returned macro will be expanded.
+     * @throws IOException
+     * @throws LexerException
+     */
+    public List<Macro> getMacros(final boolean expand) throws IOException, LexerException {
+        final List<Macro> res = new ArrayList<Macro>();
+        final Collection<Macro> macroList = macros.values();
+        for(final Macro m : macroList) {
+            if( expand && !m.isFunctionLike() ) {
+                res.add( new Macro( m, expand( m.getTokens() ) ) );
+            } else {
+                res.add( new Macro( m ) );
+            }
+        }
+        return res;
     }
 
     /**
@@ -1091,12 +1115,12 @@ public class Preprocessor implements Closeable {
             tok = source_token();
         }
 
-        if (getFeature(Feature.DEBUG))
+        if (getFeature(Feature.DEBUG)) {
             LOG.debug("Defined macro " + m);
+        }
         addMacro(m);
 
         return tok;	/* NL or EOF. */
-
     }
 
     @Nonnull
