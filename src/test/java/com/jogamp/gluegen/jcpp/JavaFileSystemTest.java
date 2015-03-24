@@ -1,4 +1,4 @@
-package org.anarres.cpp;
+package com.jogamp.gluegen.jcpp;
 
 import java.io.FileNotFoundException;
 import org.junit.Test;

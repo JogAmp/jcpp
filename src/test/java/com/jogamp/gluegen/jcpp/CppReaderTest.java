@@ -1,26 +1,33 @@
-package org.anarres.cpp;
+package com.jogamp.gluegen.jcpp;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.Collections;
+
 import javax.annotation.Nonnull;
+
 import org.junit.Test;
+
+import com.jogamp.gluegen.test.junit.generation.BuildEnvironment;
+
 import static org.junit.Assert.assertEquals;
 
 public class CppReaderTest {
 
-    public static String testCppReader(@Nonnull String in, Feature... f)
-            throws Exception {
+    public static String testCppReader(@Nonnull final String in, final Feature... f) throws Exception {
+        final String inclpath = BuildEnvironment.gluegenRoot + "/jcpp/src/test/resources" ;
+
         System.out.println("Testing " + in);
-        StringReader r = new StringReader(in);
-        CppReader p = new CppReader(r);
+        final StringReader r = new StringReader(in);
+        final CppReader p = new CppReader(r);
         p.getPreprocessor().setSystemIncludePath(
-                Collections.singletonList("src/test/resources")
+                Collections.singletonList(inclpath)
         );
         p.getPreprocessor().addFeatures(f);
-        BufferedReader b = new BufferedReader(p);
+        final BufferedReader b = new BufferedReader(p);
 
-        StringBuilder out = new StringBuilder();
+        final StringBuilder out = new StringBuilder();
         String line;
         while ((line = b.readLine()) != null) {
             System.out.println(" >> " + line);
@@ -47,7 +54,7 @@ public class CppReaderTest {
     public void testPragmaOnce()
             throws Exception {
         // The newlines are irrelevant, We want exactly one "foo"
-        String out = testCppReader("#include <once.c>\n", Feature.PRAGMA_ONCE);
+        final String out = testCppReader("#include <once.c>\n", Feature.PRAGMA_ONCE);
         assertEquals("foo", out.trim());
     }
 
@@ -56,6 +63,11 @@ public class CppReaderTest {
             throws Exception {
         // The newlines are irrelevant, We want exactly one "foo"
         testCppReader("#include <once.c>\n", Feature.PRAGMA_ONCE, Feature.LINEMARKERS);
+    }
+
+    public static void main(final String args[]) throws IOException {
+        final String tstname = CppReaderTest.class.getName();
+        org.junit.runner.JUnitCore.main(tstname);
     }
 
 }

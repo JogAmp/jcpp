@@ -1,8 +1,8 @@
-package org.anarres.cpp;
+package com.jogamp.gluegen.jcpp;
 
 import java.io.IOException;
 import org.junit.Test;
-import static org.anarres.cpp.Token.*;
+import static com.jogamp.gluegen.jcpp.Token.*;
 import static org.junit.Assert.*;
 
 /**

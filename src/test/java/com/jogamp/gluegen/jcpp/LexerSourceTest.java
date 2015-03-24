@@ -1,33 +1,36 @@
-package org.anarres.cpp;
+package com.jogamp.gluegen.jcpp;
 
 import java.util.Arrays;
+
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import static org.anarres.cpp.PreprocessorTest.assertType;
-import static org.anarres.cpp.Token.*;
+
+import com.jogamp.gluegen.Logging;
+import com.jogamp.gluegen.Logging.LoggerIf;
+
+import static com.jogamp.gluegen.jcpp.PreprocessorTest.assertType;
+import static com.jogamp.gluegen.jcpp.Token.*;
 import static org.junit.Assert.*;
 
 public class LexerSourceTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(LexerSourceTest.class);
+    private static final LoggerIf LOG = Logging.getLogger(LexerSourceTest.class);
 
-    public static void testLexerSource(String in, boolean textmatch, int... out)
+    public static void testLexerSource(final String in, final boolean textmatch, final int... out)
             throws Exception {
         LOG.info("Testing '" + in + "' => "
                 + Arrays.toString(out));
-        StringLexerSource s = new StringLexerSource(in);
+        final StringLexerSource s = new StringLexerSource(in);
 
-        StringBuilder buf = new StringBuilder();
+        final StringBuilder buf = new StringBuilder();
         for (int i = 0; i < out.length; i++) {
-            Token tok = s.token();
+            final Token tok = s.token();
             LOG.info("Token is " + tok);
             assertType(out[i], tok);
             // assertEquals(col, tok.getColumn());
             buf.append(tok.getText());
         }
 
-        Token tok = s.token();
+        final Token tok = s.token();
         LOG.info("Token is " + tok);
         assertType(EOF, tok);
 
