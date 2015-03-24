@@ -20,14 +20,11 @@
 package com.jogamp.gluegen.jcpp;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 
 import com.jogamp.gluegen.ASTLocusTag;
@@ -39,7 +36,7 @@ import com.jogamp.gluegen.Logging;
 import com.jogamp.gluegen.Logging.LoggerIf;
 
 public class JCPP implements GenericCPP {
-    private static final LoggerIf LOG = Logging.getLogger(JCPP.class);
+    private final LoggerIf LOG;
 
     public final Preprocessor cpp;
     private OutputStream out;
@@ -47,6 +44,7 @@ public class JCPP implements GenericCPP {
     private final boolean enableCopyOutput2Stderr;
 
     public JCPP(final List<String> includePaths, final boolean debug, final boolean copyOutput2Stderr) {
+        LOG = Logging.getLogger(JCPP.class);
         setOut(System.out);
         this.includePaths = includePaths;
         this.enableCopyOutput2Stderr = copyOutput2Stderr;

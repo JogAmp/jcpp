@@ -79,7 +79,7 @@ import com.jogamp.gluegen.jcpp.PreprocessorListener.SourceChangeEvent;
  */
 public class Preprocessor implements Closeable {
 
-    private static final LoggerIf LOG = Logging.getLogger(Preprocessor.class);
+    private final LoggerIf LOG;
 
     private static final Source INTERNAL = new Source() {
         @Override
@@ -127,6 +127,7 @@ public class Preprocessor implements Closeable {
     private PreprocessorListener listener;
 
     public Preprocessor() {
+        LOG = Logging.getLogger(Preprocessor.class);
         this.inputs = new ArrayList<Source>();
 
         this.macros = new HashMap<String, Macro>();

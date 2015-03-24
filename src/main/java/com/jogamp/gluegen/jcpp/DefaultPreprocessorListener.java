@@ -31,12 +31,13 @@ import com.jogamp.gluegen.Logging.LoggerIf;
  */
 public class DefaultPreprocessorListener implements PreprocessorListener {
 
-    private static final LoggerIf LOG = Logging.getLogger(DefaultPreprocessorListener.class);
+    private final LoggerIf LOG;
 
     private int errors;
     private int warnings;
 
     public DefaultPreprocessorListener() {
+        LOG = Logging.getLogger(DefaultPreprocessorListener.class);
         clear();
     }
 
