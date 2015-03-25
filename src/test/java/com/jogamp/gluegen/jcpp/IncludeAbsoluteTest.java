@@ -32,8 +32,13 @@ public class IncludeAbsoluteTest extends SingletonJunitCase {
 
         final File file = new File(filepath);
         assertTrue(file.exists());
+        final String slashifiedFilePath = IOUtil.slashify(file.getAbsolutePath(), true, false);
+        LOG.info("slashifiedFilePath: " + slashifiedFilePath);
 
-        final String input = "#include <" + file.getAbsolutePath() + ">\n";
+        // Expects something like:
+        //   WINDOWS: "/C:/projects/jogamp/gluegen/jcpp/src/test/resources/absolute.h"
+        //   UNIX:    "/projects/jogamp/gluegen/jcpp/src/test/resources/absolute.h"
+        final String input = "#include <" + slashifiedFilePath + ">\n";
         LOG.info("Input: " + input);
         final Preprocessor pp = new Preprocessor();
         pp.addInput(new StringLexerSource(input, true));
