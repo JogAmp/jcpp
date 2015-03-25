@@ -10,15 +10,19 @@ import java.util.logging.Level;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import com.jogamp.gluegen.Logging;
 import com.jogamp.gluegen.Logging.LoggerIf;
+import com.jogamp.junit.util.SingletonJunitCase;
 
 import static com.jogamp.gluegen.jcpp.Token.*;
 import static org.junit.Assert.*;
 
-public class PreprocessorTest {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class PreprocessorTest extends SingletonJunitCase {
 
     private static final LoggerIf LOG = Logging.getLogger(PreprocessorTest.class);
 

@@ -2,16 +2,20 @@ package com.jogamp.gluegen.jcpp;
 
 import java.util.Arrays;
 
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import com.jogamp.gluegen.Logging;
 import com.jogamp.gluegen.Logging.LoggerIf;
+import com.jogamp.junit.util.SingletonJunitCase;
 
 import static com.jogamp.gluegen.jcpp.PreprocessorTest.assertType;
 import static com.jogamp.gluegen.jcpp.Token.*;
 import static org.junit.Assert.*;
 
-public class LexerSourceTest {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class LexerSourceTest extends SingletonJunitCase {
 
     private static final LoggerIf LOG = Logging.getLogger(LexerSourceTest.class);
 

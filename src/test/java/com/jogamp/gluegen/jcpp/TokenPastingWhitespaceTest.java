@@ -5,10 +5,13 @@ import com.jogamp.common.util.IOUtil;
 import java.io.IOException;
 import java.io.Reader;
 
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import com.jogamp.gluegen.Logging;
 import com.jogamp.gluegen.Logging.LoggerIf;
+import com.jogamp.junit.util.SingletonJunitCase;
 
 import static org.junit.Assert.*;
 
@@ -17,7 +20,8 @@ import static org.junit.Assert.*;
  *
  * @author shevek
  */
-public class TokenPastingWhitespaceTest {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class TokenPastingWhitespaceTest extends SingletonJunitCase {
 
     private static final LoggerIf LOG = Logging.getLogger(TokenPastingWhitespaceTest.class);
 

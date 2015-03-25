@@ -1,19 +1,26 @@
 package com.jogamp.gluegen.jcpp;
 
 import java.io.StringReader;
+
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
+import com.jogamp.junit.util.SingletonJunitCase;
+
 import static org.junit.Assert.assertEquals;
 
-public class JoinReaderTest {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class JoinReaderTest extends SingletonJunitCase {
 
-    private void testJoinReader(String in, String out, boolean tg)
+    private void testJoinReader(final String in, final String out, final boolean tg)
             throws Exception {
         System.out.println("Testing " + in + " => " + out);
-        StringReader r = new StringReader(in);
-        JoinReader j = new JoinReader(r, tg);
+        final StringReader r = new StringReader(in);
+        final JoinReader j = new JoinReader(r, tg);
 
         for (int i = 0; i < out.length(); i++) {
-            int c = j.read();
+            final int c = j.read();
             System.out.println("At offset " + i + ": " + (char) c);
             assertEquals(out.charAt(i), c);
         }
@@ -21,7 +28,7 @@ public class JoinReaderTest {
         assertEquals(-1, j.read());
     }
 
-    private void testJoinReader(String in, String out)
+    private void testJoinReader(final String in, final String out)
             throws Exception {
         testJoinReader(in, out, true);
         testJoinReader(in, out, false);

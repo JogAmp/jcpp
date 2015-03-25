@@ -7,13 +7,17 @@ import java.util.Collections;
 
 import javax.annotation.Nonnull;
 
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import com.jogamp.gluegen.test.junit.generation.BuildEnvironment;
+import com.jogamp.junit.util.SingletonJunitCase;
 
 import static org.junit.Assert.assertEquals;
 
-public class CppReaderTest {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class CppReaderTest extends SingletonJunitCase {
 
     public static String testCppReader(@Nonnull final String in, final Feature... f) throws Exception {
         final String inclpath = BuildEnvironment.gluegenRoot + "/jcpp/src/test/resources" ;

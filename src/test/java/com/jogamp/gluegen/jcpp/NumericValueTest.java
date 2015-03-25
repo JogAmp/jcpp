@@ -1,7 +1,13 @@
 package com.jogamp.gluegen.jcpp;
 
 import java.io.IOException;
+
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
+import com.jogamp.junit.util.SingletonJunitCase;
+
 import static com.jogamp.gluegen.jcpp.Token.*;
 import static org.junit.Assert.*;
 
@@ -9,26 +15,27 @@ import static org.junit.Assert.*;
  *
  * @author shevek
  */
-public class NumericValueTest {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class NumericValueTest extends SingletonJunitCase {
 
-    private Token testNumericValue(String in) throws IOException, LexerException {
-        StringLexerSource s = new StringLexerSource(in);
+    private Token testNumericValue(final String in) throws IOException, LexerException {
+        final StringLexerSource s = new StringLexerSource(in);
 
-        Token tok = s.token();
+        final Token tok = s.token();
         System.out.println("Token is " + tok);
         assertEquals(NUMBER, tok.getType());
 
-        Token eof = s.token();
+        final Token eof = s.token();
         assertEquals("Didn't get EOF, but " + tok, EOF, eof.getType());
 
         return tok;
     }
 
-    private void testNumericValue(String in, double out) throws IOException, LexerException {
+    private void testNumericValue(final String in, final double out) throws IOException, LexerException {
         System.out.println("Testing '" + in + "' -> " + out);
-        Token tok = testNumericValue(in);
+        final Token tok = testNumericValue(in);
         assertEquals(in, tok.getText());
-        NumericValue value = (NumericValue) tok.getValue();
+        final NumericValue value = (NumericValue) tok.getValue();
         assertEquals("Double mismatch", out, value.doubleValue(), 0.01d);
         assertEquals("Float mismatch", (float) out, value.floatValue(), 0.01f);
         assertEquals("Long mismatch", (long) out, value.longValue());
@@ -88,7 +95,7 @@ public class NumericValueTest {
         try {
             testNumericValue("097", 97);
             fail("No warning.");
-        } catch (LexerException e) {
+        } catch (final LexerException e) {
         }
 
     }

@@ -1,17 +1,24 @@
 package com.jogamp.gluegen.jcpp;
 
 import java.io.IOException;
+
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
+import com.jogamp.junit.util.SingletonJunitCase;
+
 import static com.jogamp.gluegen.jcpp.Token.*;
 import static org.junit.Assert.*;
 
-public class ErrorTest {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class ErrorTest extends SingletonJunitCase {
 
-    private boolean testError(Preprocessor p)
+    private boolean testError(final Preprocessor p)
             throws LexerException,
             IOException {
         for (;;) {
-            Token tok = p.token();
+            final Token tok = p.token();
             if (tok.getType() == EOF)
                 break;
             if (tok.getType() == INVALID)
@@ -20,7 +27,7 @@ public class ErrorTest {
         return false;
     }
 
-    private void testError(String input) throws Exception {
+    private void testError(final String input) throws Exception {
         StringLexerSource sl;
         DefaultPreprocessorListener pl;
         Preprocessor p;
@@ -33,7 +40,7 @@ public class ErrorTest {
         try {
             assertTrue(testError(p));
             fail("Lexing unexpectedly succeeded without listener.");
-        } catch (LexerException e) {
+        } catch (final LexerException e) {
             /* required */
         }
 
