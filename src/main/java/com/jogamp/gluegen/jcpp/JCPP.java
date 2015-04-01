@@ -109,7 +109,7 @@ public class JCPP implements GenericCPP {
                                                     null != source ? source.getLine() : -1,
                                                     null != source ? source.getColumn() : -1,
                                                     macro.toString());
-                        final ConstantDefinition c = new ConstantDefinition(macro.getName(), value, locus);
+                        final ConstantDefinition c = new ConstantDefinition(macro.getName(), value, null, locus);
                         constants.add(c);
                     }
                 }
