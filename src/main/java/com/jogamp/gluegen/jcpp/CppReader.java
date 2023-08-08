@@ -1,6 +1,6 @@
 /*
  * Anarres C Preprocessor
- * Copyright (c) 2007-2008, Shevek
+ * Copyright (c) 2007-2015, Shevek
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,7 +113,10 @@ public class CppReader extends Reader implements Closeable {
             }
             return true;
         } catch (LexerException e) {
-            throw new IOException(String.valueOf(e), e);
+            // new IOException(String, Throwable) is since 1.6
+            IOException _e = new IOException(String.valueOf(e));
+            _e.initCause(e);
+            throw _e;
         }
     }
 
@@ -125,6 +128,7 @@ public class CppReader extends Reader implements Closeable {
         return token.charAt(idx++);
     }
 
+    @Override
     /* XXX Very slow and inefficient. */
     public int read(char cbuf[], int off, int len)
             throws IOException {

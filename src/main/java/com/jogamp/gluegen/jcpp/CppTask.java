@@ -1,6 +1,6 @@
 /*
  * Anarres C Preprocessor
- * Copyright (c) 2007-2008, Shevek
+ * Copyright (c) 2007-2015, Shevek
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ import java.util.Enumeration;
 import java.util.List;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.Copy;
-import org.apache.tools.ant.types.FilterSet;
-import org.apache.tools.ant.types.FilterSetCollection;
 import org.apache.tools.ant.types.Path;
 
 /**
@@ -117,6 +115,11 @@ public class CppTask extends Copy {
      }
      */
     private void preprocess(File input, File output) throws Exception {
+        if (input == null)
+            throw new BuildException("Input not specified");
+        if (output == null)
+            throw new BuildException("Output not specified");
+
         Preprocessor cpp = new Preprocessor();
         cpp.setListener(listener);
         for (Macro macro : macros)
@@ -135,10 +138,6 @@ public class CppTask extends Copy {
         }
         FileWriter writer = null;
         try {
-            if (input == null)
-                throw new BuildException("Input not specified");
-            if (output == null)
-                throw new BuildException("Output not specified");
             cpp.addInput(input);
             writer = new FileWriter(output);
             for (;;) {
@@ -181,18 +180,19 @@ public class CppTask extends Copy {
                     try {
                         log("Copying " + fromFile + " to " + toFile, verbosity);
 
-                        FilterSetCollection executionFilters
-                                = new FilterSetCollection();
-                        if (filtering) {
-                            executionFilters
-                                    .addFilterSet(getProject().getGlobalFilterSet());
-                        }
-                        for (Enumeration filterEnum = getFilterSets().elements();
-                                filterEnum.hasMoreElements();) {
-                            executionFilters
-                                    .addFilterSet((FilterSet) filterEnum.nextElement());
-                        }
-
+                        /*
+                         FilterSetCollection executionFilters
+                         = new FilterSetCollection();
+                         if (filtering) {
+                         executionFilters
+                         .addFilterSet(getProject().getGlobalFilterSet());
+                         }
+                         for (Enumeration filterEnum = getFilterSets().elements();
+                         filterEnum.hasMoreElements();) {
+                         executionFilters
+                         .addFilterSet((FilterSet) filterEnum.nextElement());
+                         }
+                         */
                         File srcFile = new File(fromFile);
                         File dstFile = new File(toFile);
                         preprocess(srcFile, dstFile);

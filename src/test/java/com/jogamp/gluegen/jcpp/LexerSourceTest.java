@@ -144,4 +144,9 @@ public class LexerSourceTest extends SingletonJunitCase {
         testLexerSource("5 /*", false, NUMBER, WHITESPACE, INVALID);    // Bug #15
         testLexerSource("5 //", false, NUMBER, WHITESPACE, CPPCOMMENT);
     }
+
+    @Test
+    public void testUnicode()throws Exception{
+        testLexerSource("foo \u2018bar\u2019 baz", true, IDENTIFIER, WHITESPACE, 8216, IDENTIFIER, 8217, WHITESPACE, IDENTIFIER);
+    }
 }

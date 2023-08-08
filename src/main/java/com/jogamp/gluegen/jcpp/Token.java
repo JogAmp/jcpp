@@ -1,6 +1,6 @@
 /*
  * Anarres C Preprocessor
- * Copyright (c) 2007-2008, Shevek
+ * Copyright (c) 2007-2015, Shevek
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
  * permissions and limitations under the License.
  */
 package com.jogamp.gluegen.jcpp;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 /**
  * A Preprocessor token.
@@ -57,6 +60,9 @@ public final class Token {
 
     /**
      * Returns the semantic type of this token.
+     *
+     * @return the semantic type of this token.
+     * @see #getTokenName(int)
      */
     public int getType() {
         return type;
@@ -70,8 +76,12 @@ public final class Token {
     /**
      * Returns the line at which this token started.
      *
-     * Lines are numbered from zero.
+     * Lines are numbered from 1.
+     *
+     * @return the line at which this token started.
+     * @see LexerSource#getLine()
      */
+    // Not @Nonnegative - might not have been assigned?
     public int getLine() {
         return line;
     }
@@ -79,8 +89,12 @@ public final class Token {
     /**
      * Returns the column at which this token started.
      *
-     * Columns are numbered from zero.
+     * Columns are numbered from 0.
+     *
+     * @return the column at which this token started.
+     * @see LexerSource#getColumn()
      */
+    // Not @Nonnegative - might not have been assigned?
     public int getColumn() {
         return column;
     }
@@ -90,8 +104,10 @@ public final class Token {
      *
      * This is distinct from the semantic value of the token.
      *
+     * @return the original or generated text of this token.
      * @see #getValue()
      */
+    // Not @Nonnull - might not have been assigned?
     public String getText() {
         return text;
     }
@@ -103,8 +119,10 @@ public final class Token {
      * For integers, this is an Integer object.
      * For other token types, as appropriate.
      *
+     * @return the semantic value of this token, or null.
      * @see #getText()
      */
+    // @CheckForNull    // Not useful to annotate, as we have usually checked the type before calling this.
     public Object getValue() {
         return value;
     }
@@ -138,7 +156,12 @@ public final class Token {
      * Returns the descriptive name of the given token type.
      *
      * This is mostly used for stringification and debugging.
+     *
+     * @param type The type constant from this class to name.
+     * @return the descriptive name of the given token type.
+     * @see Token#getType()
      */
+    @Nonnull
     public static String getTokenName(int type) {
         return TokenType.getTokenName(type);
     }

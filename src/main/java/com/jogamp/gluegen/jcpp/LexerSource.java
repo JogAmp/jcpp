@@ -1,6 +1,6 @@
 /*
  * Anarres C Preprocessor
- * Copyright (c) 2007-2008, Shevek
+ * Copyright (c) 2007-2015, Shevek
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 package com.jogamp.gluegen.jcpp;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 
@@ -25,6 +26,13 @@ import static com.jogamp.gluegen.jcpp.Token.*;
 
 /** Does not handle digraphs. */
 public class LexerSource extends Source {
+
+    @Nonnull
+    protected static BufferedReader toBufferedReader(@Nonnull Reader r) {
+        if (r instanceof BufferedReader)
+            return (BufferedReader) r;
+        return new BufferedReader(r);
+    }
 
     private static final boolean DEBUG = false;
 
@@ -70,11 +78,25 @@ public class LexerSource extends Source {
         this.reader.init(pp, this);
     }
 
+    /**
+     * Returns the line number of the last read character in this source.
+     *
+     * Lines are numbered from 1.
+     *
+     * @return the line number of the last read character in this source.
+     */
     @Override
     public int getLine() {
         return line;
     }
 
+    /**
+     * Returns the column number of the last read character in this source.
+     *
+     * Columns are numbered from 0.
+     *
+     * @return the column number of the last read character in this source.
+     */
     @Override
     public int getColumn() {
         return column;
@@ -293,6 +315,14 @@ public class LexerSource extends Source {
         return new Token(CPPCOMMENT, text.toString());
     }
 
+    /**
+     * Lexes an escaped character, appends the lexed escape sequence to 'text' and returns the parsed character value.
+     *
+     * @param text The buffer to which the literal escape sequence is appended.
+     * @return The new parsed character value.
+     * @throws IOException if it goes badly wrong.
+     * @throws LexerException if it goes wrong.
+     */
     private int escape(StringBuilder text)
             throws IOException,
             LexerException {
@@ -398,7 +428,7 @@ public class LexerSource extends Source {
         int e = read();
         if (e != '\'') {
             // error("Illegal character constant");
-			/* We consume up to the next ' or the rest of the line. */
+            /* We consume up to the next ' or the rest of the line. */
             for (;;) {
                 if (isLineSeparator(e)) {
                     unread(e);
@@ -515,8 +545,7 @@ public class LexerSource extends Source {
                 flags |= NumericValue.F_DOUBLE;
                 text.append((char) d);
                 d = read();
-            }
-            else if (Character.isUnicodeIdentifierPart(d)) {
+            } else if (Character.isUnicodeIdentifierPart(d)) {
                 String reason = "Invalid suffix \"" + (char) d + "\" on numeric constant";
                 // We've encountered something initially identified as a number.
                 // Read in the rest of this token as an identifer but return it as an invalid.
@@ -542,7 +571,7 @@ public class LexerSource extends Source {
             LexerException {
         StringBuilder part = new StringBuilder();
         int d = read();
-        if (sign && d == '-') {
+        if (sign && (d == '+' || d == '-')) {
             text.append((char) d);
             part.append((char) d);
             d = read();
@@ -630,9 +659,9 @@ public class LexerSource extends Source {
 
     /**
      * Section 6.4.4.1 of C99
-     * 
+     *
      * (Not pasted here, but says that the initial negation is a separate token.)
-     * 
+     *
      * Section 6.4.4.2 of C99
      *
      * A floating constant has a significand part that may be followed
@@ -715,8 +744,7 @@ public class LexerSource extends Source {
         text.append((char) c);
         for (;;) {
             d = read();
-            if (ppvalid && isLineSeparator(d))	/* XXX Ugly. */
-
+            if (ppvalid && isLineSeparator(d)) /* XXX Ugly. */
                 break;
             if (Character.isWhitespace(d))
                 text.append((char) d);
@@ -952,7 +980,14 @@ public class LexerSource extends Source {
             } else if (Character.isJavaIdentifierStart(c)) {
                 tok = identifier(c);
             } else {
-                tok = new Token(c);
+                String text = TokenType.getTokenText(c);
+                if (text == null) {
+                    if ((c >>> 16) == 0)    // Character.isBmpCodePoint() is new in 1.7
+                        text = Character.toString((char) c);
+                    else
+                        text = new String(Character.toChars(c));
+                }
+                tok = new Token(c, text);
             }
         }
 

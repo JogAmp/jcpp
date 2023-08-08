@@ -1,6 +1,6 @@
 /*
  * Anarres C Preprocessor
- * Copyright (c) 2007-2008, Shevek
+ * Copyright (c) 2007-2015, Shevek
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,14 @@
  */
 package com.jogamp.gluegen.jcpp;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
+import javax.annotation.Nonnull;
 
 /**
- * A {@link Source} which lexes a file.
+ * A {@link Source} which lexes an {@link InputStream}.
  *
  * The input is buffered.
  *
@@ -30,21 +31,26 @@ import java.io.InputStreamReader;
  */
 public class InputLexerSource extends LexerSource {
 
+    @Deprecated
+    public InputLexerSource(@Nonnull InputStream input) {
+        this(input, Charset.defaultCharset());
+    }
+
     /**
      * Creates a new Source for lexing the given Reader.
      *
      * Preprocessor directives are honoured within the file.
      */
-    public InputLexerSource(InputStream input)
-            throws IOException {
-        super(
-                new BufferedReader(
-                        new InputStreamReader(
-                                input
-                        )
-                ),
-                true
-        );
+    public InputLexerSource(@Nonnull InputStream input, Charset charset) {
+        this(new InputStreamReader(input, charset));
+    }
+
+    public InputLexerSource(@Nonnull Reader input, boolean ppvalid) {
+        super(input, true);
+    }
+
+    public InputLexerSource(@Nonnull Reader input) {
+        this(input, true);
     }
 
     @Override

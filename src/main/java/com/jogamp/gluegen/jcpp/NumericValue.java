@@ -1,6 +1,6 @@
 /*
  * Anarres C Preprocessor
- * Copyright (c) 2007-2008, Shevek
+ * Copyright (c) 2007-2015, Shevek
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ public class NumericValue extends Number {
     private String exponent;
     private int flags;
 
-    public NumericValue(int base, String integer) {
+    public NumericValue(@Nonnegative int base, @Nonnull String integer) {
         this.base = base;
         this.integer = integer;
     }
@@ -61,7 +61,7 @@ public class NumericValue extends Number {
         return fraction;
     }
 
-    /* pp */ void setFractionalPart(String fraction) {
+    /* pp */ void setFractionalPart(@Nonnull String fraction) {
         this.fraction = fraction;
     }
 
@@ -75,7 +75,7 @@ public class NumericValue extends Number {
         return exponent;
     }
 
-    /* pp */ void setExponent(int expbase, String exponent) {
+    /* pp */ void setExponent(@Nonnegative int expbase, @Nonnull String exponent) {
         this.expbase = expbase;
         this.exponent = exponent;
     }
@@ -110,6 +110,10 @@ public class NumericValue extends Number {
         return new BigDecimal(unscaled, scale);
     }
 
+    // We could construct a heuristic for when an 'int' is large enough.
+    // private static final int S_MAXLEN_LONG = String.valueOf(Long.MAX_VALUE).length();
+    // private static final int S_MAXLEN_INT = String.valueOf(Integer.MAX_VALUE).length();
+
     @Nonnull
     public Number toJavaLangNumber() {
         int flags = getFlags();
@@ -125,8 +129,15 @@ public class NumericValue extends Number {
             return doubleValue();	// .1 is a double in Java.
         else if (getExponent() != null)
             return doubleValue();
-        else
-            return intValue();
+        else {
+            // This is an attempt to avoid overflowing on over-long integers.
+            // However, now we just overflow on over-long longs.
+            // We should really use BigInteger.
+            long value = longValue();
+            if (value <= Integer.MAX_VALUE && value >= Integer.MIN_VALUE)
+                return (int) value;
+            return value;
+        }
     }
 
     private int exponentValue() {
@@ -135,7 +146,8 @@ public class NumericValue extends Number {
 
     @Override
     public int intValue() {
-        int v = integer.isEmpty() ? 0 : Integer.parseInt(integer, base);
+        // String.isEmpty() is since 1.6
+        int v = integer.length() == 0 ? 0 : Integer.parseInt(integer, base);
         if (expbase == 2)
             v = v << exponentValue();
         else if (expbase != 0)
@@ -145,7 +157,8 @@ public class NumericValue extends Number {
 
     @Override
     public long longValue() {
-        long v = integer.isEmpty() ? 0 : Long.parseLong(integer, base);
+        // String.isEmpty() is since 1.6
+        long v = integer.length() == 0 ? 0 : Long.parseLong(integer, base);
         if (expbase == 2)
             v = v << exponentValue();
         else if (expbase != 0)

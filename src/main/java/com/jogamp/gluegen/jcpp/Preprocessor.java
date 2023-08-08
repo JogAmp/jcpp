@@ -1,6 +1,6 @@
 /*
  * Anarres C Preprocessor
- * Copyright (c) 2007-2008, Shevek
+ * Copyright (c) 2007-2015, Shevek
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -355,7 +355,8 @@ public class Preprocessor implements Closeable {
      *
      * The given {@link Macro} object encapsulates both the name
      * and the expansion.
-     * @throws IOException
+     *
+     * @throws LexerException if the definition fails or is otherwise illegal.
      */
     public void addMacro(@Nonnull final Macro m) throws LexerException, IOException {
         // System.out.println("Macro " + m);
@@ -372,6 +373,8 @@ public class Preprocessor implements Closeable {
      *
      * The String value is lexed into a token stream, which is
      * used as the macro expansion.
+     *
+     * @throws LexerException if the definition fails or is otherwise illegal.
      */
     public void addMacro(@Nonnull final String name, @Nonnull final String value)
             throws LexerException {
@@ -399,6 +402,8 @@ public class Preprocessor implements Closeable {
      *
      * This is a convnience method, and is equivalent to
      * <code>addMacro(name, "1")</code>.
+     *
+     * @throws LexerException if the definition fails or is otherwise illegal.
      */
     public void addMacro(@Nonnull final String name)
             throws LexerException {
@@ -463,6 +468,8 @@ public class Preprocessor implements Closeable {
     /**
      * Returns the Map of Macros parsed during the run of this
      * Preprocessor.
+     *
+     * @return The {@link Map} of macros currently defined.
      */
     @Nonnull
     public Map<String, Macro> getMacros() {
@@ -497,9 +504,11 @@ public class Preprocessor implements Closeable {
      *
      * While you can modify the returned object, unexpected things
      * might happen if you do.
+     *
+     * @return the Macro object, or null if not found.
      */
     @CheckForNull
-    public Macro getMacro(final String name) {
+    public Macro getMacro(@Nonnull String name) {
         return macros.get(name);
     }
 
@@ -543,6 +552,8 @@ public class Preprocessor implements Closeable {
      * @see Source
      * @see #push_source(Source,boolean)
      * @see #pop_source()
+     *
+     * @return the top Source on the input stack.
      */
     // @CheckForNull
     public Source getSource() {
@@ -552,6 +563,8 @@ public class Preprocessor implements Closeable {
     /**
      * Pushes a Source onto the input stack.
      *
+     * @param source the new Source to push onto the top of the input stack.
+     * @param autopop if true, the Source is automatically removed from the input stack at EOF.
      * @see #getSource()
      * @see #pop_source()
      */
@@ -571,6 +584,9 @@ public class Preprocessor implements Closeable {
      *
      * @see #getSource()
      * @see #push_source(Source,boolean)
+     *
+     * @param linemarker TODO: currently ignored, might be a bug?
+     * @throws IOException if an I/O error occurs.
      */
     @CheckForNull
     protected Token pop_source(final boolean linemarker)
@@ -590,11 +606,8 @@ public class Preprocessor implements Closeable {
                 && t != null) {
             /* We actually want 'did the nested source
              * contain a newline token', which isNumbered()
-             * approximates. This is not perfect, but works.
-             * FIXME: Removed the '+ 1', since all lines were off by one.
-             * This solves this case, but I don't know _why_ this was here in the first place.
-             */
-            return line_token(t.getLine() /* SEE ABOVE: + 1 */, t.getName(), " 2");
+             * approximates. This is not perfect, but works. */
+            return line_token(t.getLine(), t.getName(), " 2");
         }
 
         return null;
@@ -1149,10 +1162,13 @@ public class Preprocessor implements Closeable {
      *
      * User code may override this method to implement a virtual
      * file system.
+     *
+     * @param file The VirtualFile to attempt to include.
+     * @return true if the file was successfully included, false otherwise.
+     * @throws IOException if an I/O error occurs.
      */
-    protected boolean include(@Nonnull final VirtualFile file)
-            throws IOException,
-            LexerException {
+    protected boolean include(@Nonnull VirtualFile file)
+            throws IOException {
         // System.out.println("Try to include " + ((File)file).getAbsolutePath());
         if (!file.isFile())
             return false;
@@ -1164,13 +1180,17 @@ public class Preprocessor implements Closeable {
     }
 
     /**
-     * Includes a file from an include path, by name.
+     * Attempts to include a file from an include path, by name.
+     *
+     * @param path The list of virtual directories to search for the given name.
+     * @param name The name of the file to attempt to include.
+     * @return true if the file was successfully included, false otherwise.
+     * @throws IOException if an I/O error occurs.
      */
-    protected boolean include(@Nonnull final Iterable<String> path, @Nonnull final String name)
-            throws IOException,
-            LexerException {
-        for (final String dir : path) {
-            final VirtualFile file = getFileSystem().getFile(dir, name);
+    protected boolean include(@Nonnull Iterable<String> path, @Nonnull String name)
+            throws IOException {
+        for (String dir : path) {
+            VirtualFile file = getFileSystem().getFile(dir, name);
             if (include(file))
                 return true;
         }
@@ -1179,6 +1199,9 @@ public class Preprocessor implements Closeable {
 
     /**
      * Handles an include directive.
+     *
+     * @throws IOException if an I/O error occurs.
+     * @throws LexerException if the include fails, and the error handler is fatal.
      */
     private void include(
             @CheckForNull final String parent, final int line,
@@ -1330,7 +1353,7 @@ public class Preprocessor implements Closeable {
 
         NAME:
         for (;;) {
-            final Token tok = token();
+            Token tok = source_token();
             switch (tok.getType()) {
                 case EOF:
                     /* There ought to be a newline before EOF.
@@ -1352,6 +1375,8 @@ public class Preprocessor implements Closeable {
                     name = tok;
                     break NAME;
                 default:
+                    warning(tok,
+                            "Illegal #" + "pragma " + tok.getText());
                     return source_skipline(false);
             }
         }
@@ -1360,7 +1385,7 @@ public class Preprocessor implements Closeable {
         final List<Token> value = new ArrayList<Token>();
         VALUE:
         for (;;) {
-            tok = token();
+            tok = source_token();
             switch (tok.getType()) {
                 case EOF:
                     /* There ought to be a newline before EOF.
@@ -1565,7 +1590,17 @@ public class Preprocessor implements Closeable {
         }
     }
 
-    private long expr(final int priority)
+    private int expr_char(Token token) {
+        Object value = token.getValue();
+        if (value instanceof Character)
+            return ((Character) value).charValue();
+        String text = String.valueOf(value);
+        if (text.length() == 0)
+            return 0;
+        return text.charAt(0);
+    }
+
+    private long expr(int priority)
             throws IOException,
             LexerException {
         /*
@@ -1601,7 +1636,7 @@ public class Preprocessor implements Closeable {
                 lhs = value.longValue();
                 break;
             case CHARACTER:
-                lhs = ((Character) tok.getValue()).charValue();
+                lhs = expr_char(tok);
                 break;
             case IDENTIFIER:
                 if (warnings.contains(Warning.UNDEF))
@@ -2128,6 +2163,8 @@ public class Preprocessor implements Closeable {
      * Returns the next preprocessor token.
      *
      * @see Token
+     * @return The next fully preprocessed token.
+     * @throws IOException if an I/O error occurs.
      * @throws LexerException if a preprocessing error occurs.
      * @throws InternalException if an unexpected error condition arises.
      */
