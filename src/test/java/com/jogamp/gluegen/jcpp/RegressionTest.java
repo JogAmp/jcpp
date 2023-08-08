@@ -3,21 +3,26 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.anarres.cpp;
+package com.jogamp.gluegen.jcpp;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
 import com.google.common.io.PatternFilenameFilter;
 import java.io.File;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.jogamp.gluegen.Logging;
+import com.jogamp.gluegen.Logging.LoggerIf;
+import com.jogamp.gluegen.test.junit.generation.BuildEnvironment;
+import com.jogamp.junit.util.SingletonJunitCase;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -25,18 +30,18 @@ import static org.junit.Assert.assertEquals;
  * @author shevek
  */
 @RunWith(Parameterized.class)
-public class RegressionTest {
+public class RegressionTest extends SingletonJunitCase {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RegressionTest.class);
+    private static final LoggerIf LOG = Logging.getLogger(RegressionTest.class);
 
     @Parameterized.Parameters(name = "{0}")
     public static List<Object[]> data() throws Exception {
-        List<Object[]> out = new ArrayList<Object[]>();
+        final List<Object[]> out = new ArrayList<Object[]>();
 
-        File dir = new File("build/resources/test/regression");
-        for (File inFile : dir.listFiles(new PatternFilenameFilter(".*\\.in"))) {
-            String name = Files.getNameWithoutExtension(inFile.getName());
-            File outFile = new File(dir, name + ".out");
+        final File dir = new File(BuildEnvironment.gluegenRoot+"/jcpp/src/test/resources/regression");
+        for (final File inFile : dir.listFiles(new PatternFilenameFilter(".*\\.in"))) {
+            final String name = Files.getNameWithoutExtension(inFile.getName());
+            final File outFile = new File(dir, name + ".out");
             out.add(new Object[]{name, inFile, outFile});
         }
 
@@ -47,7 +52,7 @@ public class RegressionTest {
     private final File inFile;
     private final File outFile;
 
-    public RegressionTest(String name, File inFile, File outFile) {
+    public RegressionTest(final String name, final File inFile, final File outFile) {
         this.name = name;
         this.inFile = inFile;
         this.outFile = outFile;
@@ -55,16 +60,24 @@ public class RegressionTest {
 
     @Test
     public void testRegression() throws Exception {
-        String inText = Files.toString(inFile, Charsets.UTF_8);
+        LOG.setLevel(Level.INFO);
+        @SuppressWarnings("deprecation")
+        final String inText = Files.toString(inFile, Charsets.UTF_8);
         LOG.info("Read " + name + ":\n" + inText);
-        CppReader cppReader = new CppReader(new StringReader(inText));
-        String cppText = CharStreams.toString(cppReader);
+        final CppReader cppReader = new CppReader(new StringReader(inText));
+        final String cppText = CharStreams.toString(cppReader);
         LOG.info("Generated " + name + ":\n" + cppText);
         if (outFile.exists()) {
-            String outText = Files.toString(outFile, Charsets.UTF_8);
+            @SuppressWarnings("deprecation")
+            final String outText = Files.toString(outFile, Charsets.UTF_8);
             LOG.info("Expected " + name + ":\n" + outText);
             assertEquals(outText, inText);
         }
 
+    }
+
+    public static void main(final String args[]) throws IOException {
+        final String tstname = RegressionTest.class.getName();
+        org.junit.runner.JUnitCore.main(tstname);
     }
 }

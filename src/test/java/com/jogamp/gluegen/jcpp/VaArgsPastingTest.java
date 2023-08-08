@@ -3,23 +3,24 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.anarres.cpp;
+package com.jogamp.gluegen.jcpp;
 
 import com.google.common.io.CharStreams;
 import java.io.IOException;
 import java.io.Reader;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.jogamp.gluegen.Logging;
+import com.jogamp.gluegen.Logging.LoggerIf;
+import com.jogamp.junit.util.SingletonJunitCase;
 import static org.junit.Assert.*;
 
 /**
  *
  * @author shevek
  */
-public class VaArgsPastingTest {
+public class VaArgsPastingTest extends SingletonJunitCase {
 
-    private static final Logger LOG = LoggerFactory.getLogger(VaArgsPastingTest.class);
+    private static final LoggerIf LOG = Logging.getLogger(VaArgsPastingTest.class);
 
     @Test
     public void testWhitespacePasting() throws IOException {
@@ -59,5 +60,11 @@ public class VaArgsPastingTest {
                 + "foo(a) // PASTE_ELLIPSIS 1\n"
                 + "foo(a,b) // PASTE_VAARGS 2\n"
                 + "foo(a) // PASTE_VAARGS 1", output);
+    }
+
+
+    public static void main(final String args[]) throws IOException {
+        final String tstname = VaArgsPastingTest.class.getName();
+        org.junit.runner.JUnitCore.main(tstname);
     }
 }
