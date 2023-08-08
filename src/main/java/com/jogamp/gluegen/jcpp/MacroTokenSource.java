@@ -29,7 +29,6 @@ import static com.jogamp.gluegen.jcpp.Token.*;
  * in any inactive context. */
 /* pp */ class MacroTokenSource extends Source {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MacroTokenSource.class);
     private final Macro macro;
     private final Iterator<Token> tokens;	/* Pointer into the macro.  */
 
