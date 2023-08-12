@@ -54,6 +54,7 @@ public class JCPP implements GenericCPP {
         cpp.addFeature(Feature.DIGRAPHS);
         cpp.addFeature(Feature.TRIGRAPHS);
         cpp.addFeature(Feature.LINEMARKERS);
+        cpp.addFeature(Feature.UNIFIED_OUTPUT);
         cpp.addFeature(Feature.CSYNTAX);
         cpp.addFeature(Feature.KEEPCOMMENTS);
         if (enablePragmaOnce) {

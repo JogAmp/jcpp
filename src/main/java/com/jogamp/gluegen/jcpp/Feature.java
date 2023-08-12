@@ -38,5 +38,12 @@ public enum Feature {
     OBJCSYNTAX,
     INCLUDENEXT,
     /** Random extensions. */
-    PRAGMA_ONCE
+    PRAGMA_ONCE,
+    /**
+     * Unified output for reproducible platform-agnostic builds, i.e.:
+     * <ul>
+     *   <li>Use unix-file-separator '/' on all platform.</li>
+     * </ul>
+     */
+    UNIFIED_OUTPUT
 }

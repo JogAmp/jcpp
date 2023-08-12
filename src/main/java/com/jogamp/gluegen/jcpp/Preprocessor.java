@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -638,10 +639,15 @@ public class Preprocessor implements Closeable {
         buf.append("#line ").append(line)
                 .append(" \"");
         /* XXX This call to escape(name) is correct but ugly. */
-        if (name == null)
+        if (name == null) {
             buf.append("<no file>");
-        else
-            MacroTokenSource.escape(buf, name);
+        } else {
+            if( File.separatorChar != '/' && getFeature(Feature.UNIFIED_OUTPUT) ) {
+                MacroTokenSource.escape(buf, name.replaceAll(Matcher.quoteReplacement(File.separator), "/"));
+            } else {
+                MacroTokenSource.escape(buf, name);
+            }
+        }
         buf.append("\"").append(extra).append("\n");
         return new Token(P_LINE, line, 0, buf.toString(), null);
     }
